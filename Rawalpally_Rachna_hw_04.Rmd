@@ -1,0 +1,873 @@
+---
+title: 'STAT 147 | HW #4'
+author: "Rachna Rawalpally"
+subtitle: Matrices, data frames, and R packages
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: '2'
+  html_document:
+    toc: yes
+    toc_depth: 2
+    number_sections: no
+    toc_float:
+      collapsed: no
+      smooth_scroll: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, error = TRUE)
+library(tidyverse)
+library(magrittr)
+library(stringr)
+library(ggplot2)
+```
+
+
+```{r}
+# You may or may not need to change the path to this file.
+# You may or may not need to change the chunk options for this code chunk.
+load("murder_weapons.RData")
+```
+
+********
+
+
+
+# Questions
+
+## Question 1: The Ballroom
+
+
+| Material |    Price per Pound  | 
+|----------|---------------------|
+| Pewter   | $4.00               | 
+| Brass    | $1.30               | 
+| Gold     | $30,735.00             | 
+| Silver   | $206.00             | 
+| Iron     | $0.07               | 
+
+
+
+1. **(10 pts total)** Complete the following using the `candles` data set:
+<br><br>
+\ \ \ \ (i)   Using functions from the dplyr (and possibly magrittr) package, complete the following.  
+\ \ \ \ \ \ (a) **(3 pts)** Create a new column named `Value_Class`.  Make the values inside equal `"precious"` if the material is either gold or silver, and `"regular` otherwise.
+
+\ \ \ \ \ \ (b) **(1 pt)** Creat a NEW column named `Price_Per_Lbs` and assign the monetary values from the table above.  
+
+\ \ \ \ \ \ (c) **(1/2 pts)** Group the data frame by the `Value_Class` column.
+\ \ \ \ \ \ (d) **(2 pts)** Calculate a group summary for the average price of each group.  Name the summary column `Average_Price`.  Report the average for each group.
+################
+\ \ \ \ \ \ (e) **(1/2 pts)** Ungroup the `candle` data frame.
+<br><br>
+\ \ \ \ (ii) **(2 pts)**  Filter the data `candle` data frame to only contain the precious metals.  Assign the result to a variable named `bling`. 
+\ \ \ \ \ \ (a) **(1 pts)** Use the summary function to find the total weight of the precious metals.  Name the summary column `Total_Weight`.  Report the total weight.
+
+
+ADD ANY CODE CHUNKS TO ANSWER THE ABOVE QUESTIONS BELOW THIS LINE
+```{r}
+###Q.1.i.a
+#'candles' becomes the result of the following 
+candles <-
+  #start with candles, and then 
+  candles %>%
+  #replace the values in the column that have FALSE with precious 
+  mutate(Value_Class = if_else(str_detect(Material, pattern = "Gold|Silver"),
+                               "precious",
+                               "regular"))
+candles
+```
+```{r}
+###Q.1.i.b
+candles <-
+#sets the data and then
+candles %>%
+#adds a new column with the given numbers 
+ mutate(Price_Per_Lbs= c(4.00, 1.30, 30735.00, 206.00, 0.07))
+#print to check
+candles
+```
+```{r}
+###Q.1.i.c
+#candles becomes the result 
+candles <-
+  #starts with candles and then 
+  candles %>%
+  #build groups around the values in that column 
+  group_by(Value_Class)
+#print to check
+groups(candles)
+```
+```{r}
+###Q.1.i.d
+#sets the data and then
+candles %>%
+  #groups the data by that column
+  group_by(Value_Class) %>%
+  #summarises the data to get the mean of those columns
+  summarise(Average_Price = mean(Price_Per_Lbs))
+#average price of precious is $15470.50
+#average price of regular is 1.79
+```
+```{r}
+###Q.1.i.e
+#starts with candles 
+candles <-
+  #sets candles and then
+candles %>%
+  #un groups the column 
+ungroup(Value_Class)
+
+#print to check
+candles 
+```
+```{r}
+###Q.1.ii
+bling <-
+  #sets candles and then 
+  candles %>%
+  #filters data frame to only include precious metals 
+   filter(candles == "precious" )
+#print to check
+bling
+```
+```{r}
+###Q.1.ii.a
+#find the total weight of the precious metals 
+Total_Weight <-sum(candles$Weight)
+#print to check
+Total_Weight
+```
+
+
+***  
+## Question 2: The Billiard Room
+
+
+2. **(11 pts total)** Complete the following using the `knife` data set:
+<br><br>
+\ \ \ \ (i)  **(2 pt)** Remove the columns that begin with `ZScore`.
+<br><br>
+\ \ \ \ (ii) **(2 pt)** Identify the unique values in all of the columns containing character class variables (with the exception of `Financial Year`.
+<br><br>
+\ \ \ \ (iii) **(1.5 pt)** Make the column `Financial Quarter` into a factor class variable.  
+\ \ \ \ \ \ (a) **(1 pt)** Make sure the levels of the factor variable are in the proper order, Q1, Q2, Q3, Q4.  If they are not in the correct order, please make them so.
+<br><br>
+\ \ \ \ (iv) **(2 pt)** How many times does each region occur in the data set?
+<br><br>
+\ \ \ \ (v) **(1 pt)** How many incidents did each force report in the data set (**HINT:** They all reported the same number of times)?
+<br><br>
+\ \ \ \ (vi) **(1.5 pt)** Refer to part (iv). How many forces are in the region that has the most observations?
+
+
+ADD ANY CODE CHUNKS TO ANSWER THE ABOVE QUESTIONS BELOW THIS LINE
+
+```{r}
+###Q.2.i
+#sets the data equal to  
+knife <-
+  #sets the data and then
+  knife %>%
+  #gets rid of columns that start with ZScore 
+  select(-starts_with("ZScore"))
+#print the names of the new column 
+names(knife)
+```
+```{r}
+###Q.2.ii
+#gets the variables that are character variables
+sapply(knife,class)
+#gets the unique values for this column 
+unique(knife$`Force Name`)
+#gets the unique columns for this column 
+unique(knife$Region)
+#gets the unique columns for this column
+unique(knife$`Financial Quarter`)
+```
+```{r}
+###Q.2.iii
+#changes the class the factor 
+knife$`Financial Quarter` <- as_factor(knife$`Financial Quarter`)
+#checks the class 
+class(knife$`Financial Quarter`)
+```
+```{r}
+###Q.2.iii.a
+#sets the column to factor and in order
+levels(knife$`Financial Quarter`) <- c("Q1", "Q2", "Q3", "Q4")
+knife %$% 
+  levels(`Financial Quarter`)
+```
+```{r}
+###Q.2.iv
+#amount of times region occurs in the data set 
+knife %>%
+  group_by(Region) %>%
+  summarise(counts = n())
+```
+```{r}
+###Q.2.v
+#amount of incidents in force report
+knife %>%
+  group_by(`Force Name`) %>%
+  summary(counts = n ()) %>%
+  unique(counts)
+#44
+```
+```{r}
+###Q.2.vi
+#sets the data equal to 
+region <- 
+  #sets the data and then 
+  knife %>%
+  #filters the data to only include regions in the east 
+  filter(Region == "East")
+#counts the forces that are in that region 
+unique(region$`Force Name`)
+#6
+```
+
+
+***  
+
+## Question 3: The Conservatory
+
+
+3. **(10 pts total)** Using pipe operators to build a **single, continuous sequence of instructions**, complete the following using the `chop_chop` data set.  Be sure to comment each step clearly:
+<br><br>
+\ \ \ \ (i)  **(1 pt)** Make the `type` column "Title Case".
+<br><br>
+\ \ \ \ (ii)  **(1 pt)** Make the `origin` column "UPPER CASE".
+<br><br>
+\ \ \ \ (iii)  **(2 pt)** Create a new column called `murica` that detects if the `origin` column references the Americas.
+<br><br>
+\ \ \ \ (iv)  **(2 pt)** Reorganize the columns such that `murica` comes first, `origin` comes second and `type` comes last.
+<br><br>
+\ \ \ \ (v)  Sort the rows of `chop_chop`  
+\ \ \ \ \ \ (a) **(1 pt)** First by `murica` such that `TRUE` is on top and `FALSE` is below.  
+\ \ \ \ \ \ (b) **(1.5 pt)** Then, within those groups, sort by `type` in ascending order.
+<br><br>
+\ \ \ \ (vi)  **(1/2 pt)** Group the data frame by the values in the logical column created in part (iii).
+<br><br>
+\ \ \ \ (vii)  **(2 pt)** Create a new column named `counts` which contains the number of rows/observations within each group (without using the `summarise()` function).
+
+
+ADD ANY CODE CHUNKS TO ANSWER THE ABOVE QUESTIONS BELOW THIS LINE
+
+```{r}
+###Q.3.i
+#sets the data 
+chop_chop <-
+  #sets the data and then 
+  chop_chop %>%
+  #changes the name of the column
+  mutate(type = str_to_title(type))
+#print to check
+chop_chop
+```
+```{r}
+###Q.3.ii
+#sets the data equal to 
+chop_chop <-
+  #pulls the data and then 
+  chop_chop %>%
+  #changes the column to all upper case 
+  mutate(origin = str_to_upper(origin))
+#print to check
+chop_chop
+```
+```{r}
+###Q.3.iii
+#sets the data equal to 
+chop_chop <-
+  #sets the data and then  
+  chop_chop %>%
+  #creates new column that contains detects america
+  mutate(murica = str_detect(string = origin, pattern = "AMERICA")) %>%
+  #create the column in the data frame 
+  select(murica, everything())
+#print to check
+chop_chop
+```
+```{r}
+###Q.3.iv
+#sets the data and then 
+chop_chop %>%
+  #sets the column order 
+  select(murica, origin, type)
+```
+```{r}
+###Q.3.v.a
+#sets the data frame 
+chop_chop <-
+  #sets the data and then 
+  chop_chop %>%
+  #arranges the data from descending order 
+  arrange(desc(murica))
+  #prints to check
+  chop_chop
+```
+```{r}
+###Q.3.v.b
+#sets the data equal to 
+chop_chop <-
+  #sets the data and then
+  chop_chop %>%
+  #arranges the data in order of type
+  arrange(type) %>%
+  #and the arranges the data of that column in order of descending 
+  arrange(desc(murica))
+#print to check
+chop_chop
+```
+```{r}
+###Q.3.vi
+#sets the data frame 
+chop_chop <-
+  #sets the data and then 
+  chop_chop %>%
+  #groups the data 
+  group_by(murica)
+```
+```{r}
+###Q.3.vii
+#gets the data and then 
+chop_chop %>%
+  #groups the data by the column
+  group_by(murica) %>%
+  #counts the number of observations
+  add_count()
+
+```
+
+***
+
+
+## Question 4: The Dining Room
+
+
+4. **(20 pts total)** Complete the following using the `bang_bang` data set: 
+<br><br>
+\ \ \ \ (i)  **(1/2 pt)** Select the columns as follows:  
+\ \ \ \ \ \ (a) **(3.5 pt)** Keep the `state` column and all columns that start with "private", "redemption", or "return". 
+\ \ \ \ \ \ (b) **(2 pt)** Drop all any remaining columns if they end with "other".  
+<br><br>
+\ \ \ \ (ii)  **(1/2 pt)** Read about the `complete.cases()` function.  
+\ \ \ \ \ \ (a) **(1/2 pt)** From which package does this function originate? 
+
+\ \ \ \ \ \ (b) **(2 pt)** Use this function to remove ALL rows that contain ANY missing (`NA`) values.   
+\ \ \ \ \ \ (d) **(1 pt)** How many observations remain after removing those rows? 
+\ \ \ \ \ \ (c) **(1 pt)** How many rows had at least one missing (`NA`) value?
+<br><br>
+\ \ \ \ (iii)  **(2 pt)** How many observations are there for each state (**HINT**: Each state occurs the same number of times!)
+<br><br>
+\ \ \ \ (iv)  **(1 pt)** Use the exposition pipe operator to plot `private_sale_handgun` (x) vs `private_sale_long_gun` (y).
+<br><br>
+\ \ \ \ (v)  **(2 pt)** Use the `lm()` function to fit a linear gression, using `private_sale_handgun` as the independent (x) variabe, and `private_sale_long_gun` as the dependent (y) variable. 
+\ \ \ \ \ \ (a) **(1/2 pt)**  store the linear model to a variable named `gun_lm`. 
+\ \ \ \ \ \ (b) **(1.5 pt)**  Use the appropriate function(s) to obtain the model estimates and the (Multiple) R-Squared value.  
+\ \ \ \ \ \ (c) **(3 pt)** In a separate code chunk, replot `private_sale_handgun` (x) vs `private_sale_long_gun` (y) and draw a red, deshed line over it using the `gun_lm` variable. Adjust the code chunk options so that the code does not show up when you knit the document, but the plot does.
+
+
+
+ADD ANY CODE CHUNKS TO ANSWER THE ABOVE QUESTIONS BELOW THIS LINE
+
+```{r}
+###Q.4.i.a
+#sets the data equal to 
+bang_bang <-
+  #sets the data and then
+  bang_bang %>%
+  #keeps the columns starting with the column names
+  select(starts_with("private_"),starts_with("redemption_"), 
+         starts_with("return_"), state)
+#checks to names of the columns in the data frame 
+names(bang_bang)
+```
+```{r}
+###Q.4.i.b
+#sets equal to 
+bang_bang <-
+  #sets the data and then 
+  bang_bang %>%
+  #gets rid of columns ending with other 
+  select(-ends_with("_other"))
+#checks to make sure the columns are gone 
+names(bang_bang)
+```
+###Q.ii.a
+#it is from the R stats package 
+```{r}
+###Q.4.ii.b
+#function locates all the rows missing NA
+bang_bang <- filter(complete.cases(.))
+#gets rid of the all of rows missing NA
+bang_bang
+```
+```{r}
+###Q.4.ii.d
+#gives the dimesions of the data frame 
+nrow(bang_bang)
+#3135 observations 
+```
+```{r}
+###Q.4.ii.c
+#counts the rows missing an NA
+nrow(bang_bang)
+#0
+```
+```{r}
+###Q.4.iii
+#sets the function and then
+bang_bang %>%
+  #group the function by column
+  group_by(state) %>%
+  #count the amount of observations 
+  summarise(count = n()) $#$
+  unique(n)
+#57
+```
+```{r}
+###Q.4.iv
+#sets the function and then
+bang_bang %$%
+  #plots the function
+  plot(private_sale_handgun, private_sale_long_gun)
+```
+```{r}
+###Q.4.v
+#function to fit a linear regression
+lm(formula = private_sale_long_gun ~ private_sale_handgun, 
+   data = bang_bang)
+```
+```{r}
+###Q.4.v.a
+#sets the linear regression function equal to a new variable 
+gun_lm <- lm(formula = private_sale_long_gun ~ private_sale_handgun, 
+   data = bang_bang)
+```
+```{r}
+###Q.4.v.b
+##sets the linear regression function equal to a new variable 
+gun_lm <- lm(formula = private_sale_long_gun ~ private_sale_handgun, 
+   data = bang_bang)
+#summary function to find model estimates
+summary(gun_lm)
+```
+```{r}
+###Q.4.v.c
+#sets the data and then 
+bang_bang %$%
+  #plots the data 
+  plot(private_sale_handgun, private_sale_long_gun)
+#uses the data to create a line in teh graph 
+#the line is red and dashed 
+abline(gun_lm,
+       col = "red",
+       lty = 2)
+```
+
+***  
+
+## Question 5: The Hall
+
+
+5. **(9 pts)** Complete the following using the `ntrl_rope` and `synth_rope` data sets.  Feel free to use the [`stringr` cheat sheet](https://evoldyn.gitlab.io/evomics-2018/ref-sheets/R_strings.pdf). 
+<br><br>
+\ \ \ \ (i)  **(1 pt)**  For the natural rope, modify the `Material` to "Title Case".
+<br><br>
+\ \ \ \ (ii)  **(1 pt)**   For the synthetic rope, modify the `Material` to "lower case".
+<br><br>
+\ \ \ \ (iii)  **(1 pt)**  Combine the two data frames in to a new data frame named `all_rope`.
+<br><br>
+\ \ \ \ (iv)  **(2 pt)**   Filter the rows such that the `Material` column contains at least one "y" in the name. Then arrange the rows by the `Length` column.
+<br><br>
+\ \ \ \ (v)  **(4 pt)** Create a new column named `name_len` which contains the number of letters in the `Material` column.  Then, find the average name length for each `Type`. 
+
+
+ADD ANY CODE CHUNKS TO ANSWER THE ABOVE QUESTIONS BELOW THIS LINE
+
+```{r}
+###Q.5.i
+#changes the column names to all title names
+ntrl_rope$Material = str_to_title(ntrl_rope$Material)
+#print to check
+ntrl_rope
+```
+```{r}
+###Q.5.ii
+#changes the column names to all lower
+synth_rope$Material = str_to_lower((synth_rope$Material))
+#print to check
+synth_rope
+```
+```{r}
+###Q.5.iii
+#combine the data frames 
+all_rope <- rbind(ntrl_rope, synth_rope)
+#print to check
+all_rope
+```
+```{r}
+###Q.5.iv
+#sets the data equal to 
+all_rope <-
+  #sets the data and then
+  all_rope %>%
+  #filter the data to only include one y
+  filter(str_detect(string = Material, pattern = "y")) %>%
+  #arrange the lengths by descending order
+  arrange(desc(Length))
+#print to check
+all_rope
+```
+```{r}
+###Q.5.v
+all_rope %>%
+#gets the number of character for each column
+  mutate(name_len = str_length(Material)) %>%
+#binds the columns together
+  group_by(Type) %>%
+#gets the mean of the column
+  summarise(avg_name_len = mean(name_len))
+```
+***  
+
+
+## Question 6: The Kitchen
+
+
+6. **(12 pts)** Complete the following.  Feel free to use the [R Markdown cheat sheet](https://rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf). 
+<br><br>
+\ \ \ \ (i) Google the term `u can't touch this lyrics`.  
+\ \ \ \ \ \ (a) **(1.5 pt)** Using rmakdown syntax, create an un-ordered list of the first four lines of the lyrics to the song.  
+\ \ \ \ \ \ (b) **(1.5 pt)**  Using rmakdown syntax, continue the above un-ordered list with subitems for the next four lines (lines 5 through 8) of lyrics.  
+\ \ \ \ \ \ (c) **(2 pt)**  Using rmakdown syntax, add the next four lines (lines 9 through 12) of lyrics in a `block-quote`. Make sure each lyric line shows up on it's own line in the final knitted document.
+<br><br>
+\ \ \ \ (ii) Complete the following using the `hammer_time` data set:  
+\ \ \ \ \ \ (a) **(2 pt)** In a single chain of piped instructions, convert the `chart_position` column of the `hammer_time` data frame to be `numeric`, then filter out the missing value. 
+\ \ \ \ \ \ (b) **(1 pt)** Calculate the mean chart position of the remaining 5 songs.
+\ \ \ \ \ \ (c) **(3 pt)** Use **in-line `R` code** to write a sentence which reports the average chart position of the remaining 5 songs.
+<br><br>
+\ \ \ \ (iii)  **(1 pt)** Filter the data frame to only contain the songs that made it into the top 10 chart positions.
+<br><br>
+
+
+###Q.6.i.a and ###Q.6.i.b
+
+* You can't touch this
+* You can't touch this
+* You can't touch this
+* You can't touch this
+  + My, my, my my music hits me so hard
+  + Makes me say, "Oh my Lord"
+  + Thank you for blessin' me
+  + With a mind to rhyme and two hype feet
+
+
+####Q.6.i.c
+
+> It feels good, when you know you're down
+
+> A super dope homeboy from the Oaktown
+
+> And I'm known as such
+
+> And this is a beat, uh you can't touch.
+
+```{r}
+###Q.6.ii.a
+#sets the data equal to
+hammer_time <-
+  #sets the data and then
+  hammer_time %>%
+  #filter to not include the missing value
+  filter(chart_position != ".")
+#change class to numeric
+  hammer_time$chart_position <- as.numeric(hammer_time$chart_position) 
+#print to check
+hammer_time
+#check class
+class(hammer_time$chart_position)
+```
+```{r}
+###Q.6.ii.b
+#gets the mean of the chart position
+mean(hammer_time$chart_position)
+#32.8
+```
+
+
+###Q.6.ii.c
+
+The average chart position of the remaining 5 songs is 
+`r mean(hammer_time$chart_position)`.
+
+ADD ANY ADDITIONAL CODE CHUNKS TO ANSWER THE ABOVE QUESTIONS BELOW THIS LINE
+
+```{r}
+###Q.6.iii
+#sets the data equal to 
+hammer_time <-
+  #sets the data and then 
+  hammer_time %>%
+  #filter the data to only include equal or greater than 10
+  filter(chart_position <= 10)
+#print to check
+hammer_time
+```
+
+***  
+
+
+ 
+## Question 7: The Library
+
+
+
+7. **(16 pts)** Complete the following using the `bottles` data set: 
+<br><br>
+Note that there is a problem with the `price` column:  While it represents price (a numeric value) the class of that column is `character`.  This is because some of the values have a comma `,` or `$`  in them in them, while others actually have entire words (for instance, `$15,000 or $60,000/set`).
+<br><br>
+\ \ \ \ (i)    In a single sequence of piped commands:  
+\ \ \ \ \ \ (a) **(3 pts)** Read the documentation for `str_detect()` and use it to filter out the rows in the bottles data frame for which `price` that contain a forward slashe "`/`".  
+\ \ \ \ \ \ (b) **(4.5 pts)** Use the `str_remove()` function to take any commas out of the `price` column.  (**We DON'T want to remove those rows!**  Instead, we want to remove those COMMAS and leave the rest of the price as-is.)  
+\ \ \ \ \ \ (c) **(1 pts)** Convert the price column to a numeric variable. 
+\ \ \ \ \ \ (d) **(2 pts)** Place the `price` and `review_points` column on the left side of the data frame, and then keep all other columns to the right.
+<br><br>
+\ \ \ \ (ii) **(2 pts)** Use the exposition pipe operator to plot `price` vs `review_points`.
+<br><br>
+\ \ \ \ (iii) **(3.5 pts)** Use the exposition pipe operator to plot `price` vs `review_points` with both variables on a log scale **WITHOUT** using the `log()` function.
+
+
+
+ADD ANY CODE CHUNKS TO ANSWER THE ABOVE QUESTIONS BELOW THIS LINE
+
+```{r}
+###Q.7.i.a
+#sets the data equal to 
+bottles <-
+  #sets the data and then 
+  bottles %>%
+  #filter the data to get rid of forward slash
+  mutate(price = str_remove_all(string = price, pattern = "/"))
+#print to check
+bottles
+```
+```{r}
+###Q.7.i.b
+#sets the data equal to 
+bottles <-
+  #sets the data and then
+  bottles %>%
+  #removes all of the commas in that column
+  mutate(price = str_remove_all(string = price, pattern = "[,]"))
+#print to check
+bottles
+```
+```{r}
+###Q.7.i.c
+#convert the column to numeric
+bottles$price <- as.numeric(bottles$price)
+#checks the class
+class(bottles$price)
+```
+```{r}
+###Q.7.i.d
+#sets the data equal to 
+bottles <-
+  # sets the data and then
+  bottles %>%
+  #Select the data to arrange the columns in a specific order 
+  select(price, review_point, everything())
+#print to check
+bottles
+```
+```{r}
+###Q.7..ii
+#sets the data using the exposition pipe operator
+bottles %$%
+  #plots the data 
+  plot(price, review_point)
+```
+```{r}
+###Q.7.iii
+#sets the data and then
+bottles %$%
+  #plots the data using log scale  
+  plot(x= price, y= review_point, log = "xy")
+```
+
+
+***  
+
+ 
+## Question 8: The Lounge
+
+
+8. **(13 pts total)** Complete the following using the `pipes` data set: 
+<br><br>
+How many addresses show up three or more times??  List them in order of counts, and alphabetically within each count group.
+
+
+
+ADD ANY CODE CHUNKS TO ANSWER THE ABOVE QUESTIONS BELOW THIS LINE
+
+```{r}
+###Q.8
+#sets the data frame to only include addresses
+n_occur <- data.frame(table(pipes$Full_Address))
+#sets new data frame to only contain addresses greater or equal to 3
+New_address <- pipes[pipes$Full_Address %in% n_occur$Var1[n_occur$Freq >= 3],]
+#sets the data and then
+New_address %>%
+  #group the data by the column and then 
+  group_by(Full_Address) %>%
+  #summarize the data and count and then
+  summarise(counts = n()) %>%
+  #arranges the data in order of count and alphabetically 
+  arrange(desc(counts), order(Full_Address))
+
+```
+
+***  
+
+
+## Question 9: The Study
+
+
+9. **(14 pts)** Complete the following using the `wrenches` data set:
+<br><br>
+\ \ \ \ (i) **(2 pt)** Filter out the rows for which there are missing (`NA`) values in the `British/Commonwealth name` column.
+<br><br> 
+\ \ \ \ (ii) **(2 pt)** How many wrenches fall into each `Group` catergory??
+<br><br> 
+
+
+\ \ \ \ (iii) **(3 pts)**  How many wrenches have the same name in both countries?  Subset the data frame to just those rows using only the `filter()` function.
+<br><br>
+\ \ \ \ (iv) **(3 pts)** How many wrenches/spanners do not have an identified name in the `British/Commonwealth name` column?
+<br><br>
+\ \ \ \ (v) Some of the tools have an animal name in them.  Those names are one of the following: `monkey`, `crow`, `spider`, `dog`, or `alligator`.  
+\ \ \ \ \ \ (a) **(1 pts)** How many American wrench names contain an animal name?
+\ \ \ \ \ \ (b) **(1 pts)** How many British wrench names contain an animal name?
+<br><br>
+\ \ \ \ (vi) In the UK, the common name for a wrench is a "spanner".  
+\ \ \ \ \ \ (a) **(1 pts)** How many British wrench names contain the word "spanner"?
+\ \ \ \ \ \ (b) **(1 pts)** How many American wrench names contain the word "spanner"?
+ADD ANY CODE CHUNKS TO ANSWER THE ABOVE QUESTIONS BELOW THIS LINE
+
+```{r}
+###Q.9.i
+#sets the data
+wrenches <-
+  #uses the data and then 
+  wrenches %>%
+  #filters to not include missing NA
+  filter(`British/Commonwealth name` != "NA")
+#print to check
+wrenches
+```
+```{r}
+###Q.9.ii
+#sets the data and then
+wrenches %>%
+  #groups the data by Group column
+  group_by(Group) %>%
+  #counts the data 
+  summarise(count = n())
+```
+```{r}
+###Q.9.iii
+  #uses this data set and then 
+  wrenches %>%
+  #filters the data set to only the rows that follow the logical comparison
+  filter(`American name` == `British/Commonwealth name`)
+#print to check
+wrenches
+#3
+```
+```{r}
+###Q.9.iv
+  #uses this data set and then 
+  wrenches %>%
+  #filters the data set to only the rows that follow the logical comparison
+  filter(`British/Commonwealth name` == "?") %>%
+  nrow()
+#print to check
+wrenches
+#10
+```
+```{r}
+###Q.9.v.a
+#the rows with contains that word 
+grep("monkey",wrenches$`American name`)
+#the rows with contains that word 
+grep("crow", wrenches$`American name`) 
+#the rows with contains that word 
+grep("spider", wrenches$`American name`)
+#the rows with contains that word 
+grep("dog", wrenches$`American name`) 
+#the rows with contains that word 
+grep ("alligator", wrenches$`American name`) 
+#6
+```
+```{r}
+###Q.9.v.b
+#the rows with contains that word 
+grep("monkey",wrenches$`British/Commonwealth name`)
+#the rows with contains that word 
+grep("crow", wrenches$`British/Commonwealth name`) 
+#the rows with contains that word 
+grep("spider", wrenches$`British/Commonwealth name`)
+#the rows with contains that word 
+grep("dog", wrenches$`British/Commonwealth name`) 
+#the rows with contains that word 
+grep ("alligator", wrenches$`British/Commonwealth name`) 
+#2
+```
+```{r}
+###Q.9.vi.a
+#shows how many wrenches in that column cotain that word
+length(grep("spanner", wrenches$`British/Commonwealth name`))
+#18
+#or
+wrenches %>%
+  filter(str_detect(`British/Commonwealth name`, pattern = "spanner"))
+```
+```{r}
+###Q.9.vi.b
+#shows how many wrenches in that column contain that word
+length(grep("spanner", wrenches$`American name`))
+#1
+```
+
+
+****
+<p style="font-size:30px;color:#003DA5">
+<b>Congratulations!</b>  You've completed the assignment.
+<br><br>
+Please be sure to upload the completed HW's:  
+\ \ \ 1. `.Rmd` file  
+\ \ \ 2. `html` file <br>
+to the online submission form.
+</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
