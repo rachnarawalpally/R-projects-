@@ -1,0 +1,277 @@
+---
+title: "Week 7 hw"
+author: "Rachna Rawalpally"
+date: "11/19/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(magrittr)
+```
+
+
+
+Question 1.
+```{r}
+#creates a vector 
+a <- c(1,2,3)
+#checks the length of the vector
+length(a)
+#this creates ifelse statement 
+ifelse(a[3]>a[2] &a[2] >a[1], "GROWING", "NOT Growing")
+```
+
+Question 2.
+```{r}
+#creates a vector that is length of 3
+a <- c(2,3,4)
+#creates an if statement if the vector is increasing 
+if(a[3]>a[2] &a[2] >a[1]){
+  #prints if the statement is true 
+  print("GROWING")
+  #else if statement if the vector is decreasing 
+} else if(a[3]<a[2] &a[2] <a[1]){
+  #prints if the above statement is true 
+  print("SKRINKING")
+  #else statement prints if the above are not true 
+}else{
+  #prints if the above is true 
+  print("PEAKING")
+}
+```
+
+Question 3.
+```{r}
+#creates a vector
+a <- c(3,4,5)
+#logical expression with an if statement 
+if((a[1]>a[2]) & (a[2]>a[3])){
+  #prints if, if the statement is true
+  print(a)
+  #logical expression with an else if statement 
+}else if ((a[1]>a[3]) & (a[3]>a[2])){
+  #prints if the else if statement is true 
+  print(c(a[1],a[3],a[2]))
+  #logical expression with an else if statement 
+}else if ((a[2]>a[1]) & (a[1]>a[3])){
+  #prints if the else if statement is true
+  print(c(a[2],a[1],a[3]))
+  #logical expression with an else if statement 
+}else if ((a[2]>a[3]) & (a[3]>a[1])){
+  #prints if the else if statement is true
+  print(c(a[2],a[3],a[1]))
+  #logical expression with an else statement 
+}else if((a[3]>a[1]) & (a[1]>a[2])){
+  #prints if the else if statement is true
+  print(c(a[3],a[1],a[2]))
+  #else statement 
+}else{
+  #prints if the else if statement is true
+  print(c(a[3],a[2],a[1]))
+}
+```
+
+Question 4.
+```{r}
+#this gets the data set 
+file_name <- data("iris")
+#this brings all the column names in one vector
+col_names <- colnames(iris)
+#this uses a for loop
+for(x in col_names){
+  #prints the iterations 
+  print((paste0(col_names," ",nchar(col_names))))
+  #breaks to only print once 
+  break
+}
+```
+
+Question 5.
+```{r}
+#this creates the matrix
+row_minus_col <- matrix(nrow = 5, ncol = 5)
+#creates a vector
+a <- c(0,-1,-2,-3,-4)
+#creates a vector
+b <- c(0,1,2,3,4)
+#for loop that takes the first 5 values 
+for(x in 1:5){
+  ##for loop that takes the first 5 values 
+  for(n in 1:5){
+    #takes the values and subtracts them each time 
+    row_minus_col[x,n]=x-n
+  }
+}
+#prints the matrix 
+row_minus_col
+```
+
+Question 6.
+```{r}
+#this creates the matrix
+row_col_distance <- matrix(nrow = 5, ncol = 5)
+#creates a vector
+a <- c(0,1,2,3,4)
+#creates a vector
+b <- c(0,1,2,3,4)
+#for loop that takes the first 5 values 
+for(x in 1:5){
+  ##for loop that takes the first 5 values 
+  for(n in 1:5){
+    #takes the values and subtracts them each time 
+    row_col_distance[x,n]=abs(x-n)
+  }
+}
+#prints the matrix 
+row_col_distance
+```
+
+Question 7.
+```{r}
+#sets r equal to 1
+r <- 1
+#uses a while loop to find the factorial that is <= or equal to 10 million
+while(factorial(r)<= 10^7){
+  #prints the factorial
+  print(factorial(r))
+  #adds 1 to the factorial each time til it stops 
+  r <- r + 1
+}
+```
+
+Question 8.
+```{r, eval=FALSE}
+#set n equal to 1
+n <- 1
+#this creates a while loop
+while(n < 5 )
+  #repeats til the loop breaks
+repeat{
+  #picks the random two numbers 
+  number <- sample(2:12,2, replace = TRUE)
+  #creates a readline that shows the two numbers
+  user_guess <- readline(paste0("Find the product of ",number[1], "and", 
+                                number[2]))
+  #if statement with the logical expression
+  if(user_guess == prod(number) & (n < 5)){
+    #prints ()
+    print("That's correct!")
+    #adds to n each time in the loop
+    n <- n + 1
+    #subtracts from n in the loop
+    guess_left <- 5-n
+    #prints how many guesses left 
+    print(paste0("guess left:", guess_left))
+    #this breaks the loop once the outcomes are meet
+    break
+    #else statement, used once the if statement is no longer true 
+  }else if{
+    print("Not Correct")
+    break
+  }
+}
+```
+
+Question 9.
+```{r, eval= FALSE}
+#this creates the matrix
+my_binom_stats <- data.frame(y = (0:17), 
+                             pdf_y = dbinom(y, size = 17, prob = 0.83))
+#names the vector
+my_binom_loops <- data.frame(y = numeric(18),
+             pdf_y = numeric(18))
+#creates a for loop with two columns 
+for(c in 0:2){
+  #for loops with 18 rows 
+  for(r in 0:18){
+    #logical expression 
+    if(c ==1){
+      #goes through the formula if the if statement is true
+      my_binom_loops[r,c] <- (r-1)
+      #if the if statement is false then does the else statement 
+    }else if (c==2){
+      #prints the binomial distribution for the numbers 
+      my_binom_loops[r,c] <- dbinom(r-1, size = 17, prob = 0.83)
+    }
+  }
+}
+#print to check
+my_binom_stats
+#print to check
+my_binom_loops
+```
+
+Question 10.
+```{r, eval=FALSE}
+#calls the data 
+set.seed(147)
+#creates a vector from the data frame and samples the first 6
+my_binom_shuffle <- sample(nrow(my_binom_stats),6, replace = TRUE)
+#prints to check
+my_binom_shuffle
+```
+
+Question 11.
+```{r}
+#reads the file and names it 
+messy_gas <- read_csv('gas.tsv', skip = 3, col_names = TRUE)
+#names the data frame
+messy_gas <-
+  #gets the data
+  messy_gas %>%
+  #creates a column to include the number of cars
+  mutate(car_number = paste0("car", 1:10)) %>%
+  #orders the column order
+  select(car_number, regular, premium)
+#names the data frame 
+pivot_gas <-
+  #gets the data
+  messy_gas %>%
+  #names the column of the data 
+  pivot_longer(!car_number, names_to = "type", values_to = "price")
+#names the data frame
+loop_gas <-
+  #creates a data frame from the data from messy_gas 
+  data.frame(car_number = character(20),
+           type = character(20),
+           price = double(20))
+#creates a for loop about the 3 column 
+for (c in 1:3) {
+  #creates a for loop about the 20 rows 
+  for (r in 1:20) {
+    #uses an if statement with logical expression
+    if (c == 1) {
+      #use this formula if the if statement is true 
+      loop_gas$car_number <- rep(paste0("car", 1:10), times = 1, each = 2)
+      #if the second column is true 
+    } else if (c == 2) {
+      #use this formula to get the type of gas
+      loop_gas$type <- rep(c("regular", "premium"), times = 10)
+      #if the column is 3 and the top 10 rows 
+    } else if (c == 3 & r <= 10) {
+      #takes the data from messy gas and adds it to loop gas 
+      loop_gas[r + r - 1,c] <- messy_gas[r,c-1]
+      #takes the data from messy gas and adds it to loop gas
+      loop_gas[r + r,c] <- messy_gas[r,c]
+    }
+  }
+}
+#print to check
+pivot_gas
+#print to check
+loop_gas
+#makes sure the data frames are equal
+all_equal(pivot_gas, loop_gas)
+```
+
+
+
+
+
+
+
+
+
+
